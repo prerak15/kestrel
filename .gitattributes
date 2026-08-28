@@ -1,0 +1,26 @@
+# Normalize all text to LF in the repository and on checkout
+* text=auto eol=lf
+
+# Shell scripts MUST be LF — CRLF breaks the shebang
+*.sh text eol=lf
+
+# Windows scripts MUST be CRLF
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary: never normalize, never diff as text
+*.png binary
+*.jpg binary
+*.pdf binary
+*.gz binary
+*.zip binary
+*.parquet binary
+*.npy binary
+*.npz binary
+*.bin binary
+*.onnx binary
+*.safetensors binary
+
+# Collapse lockfile diffs in review
+uv.lock linguist-generated=true
+Cargo.lock linguist-generated=true

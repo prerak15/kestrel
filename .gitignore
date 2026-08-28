@@ -1,0 +1,40 @@
+# ── Data (never committed; the manifest is the reproducible record) ──
+data/*
+!data/manifest.json
+
+# ── Python ──
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# ── Rust ──
+target/
+
+# ── Bulk experiment output (curated results go in docs/findings/) ──
+results/raw/
+ray_results/
+*.log
+
+# ── Models and downloaded weights ──
+models/
+
+# ── Terraform (but .terraform.lock.hcl IS committed) ──
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# ── Secrets ──
+.env
+.env.*
+
+# ── Editor / OS ──
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
