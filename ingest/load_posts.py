@@ -66,8 +66,10 @@ def load_posts(batch_size=1000):
     ):
         context = ET.iterparse(sys.argv[1], events=("start", "end"))
         _, root = next(context)
+        count = 0
         for event, elem in context:
             if event == "end" and elem.tag == "row":
+                count += 1
                 item_data = {
                     "id": to_int(elem.attrib.get("Id")),
                     "post_type_id": to_int(elem.attrib.get("PostTypeId")),
@@ -88,6 +90,8 @@ def load_posts(batch_size=1000):
                     "favorite_count": to_int(elem.attrib.get("FavoriteCount")),
                 }
                 batch.append(item_data)
+                if count % 100_000 == 0:
+                    print(f"rows parsed {count}", flush=True)
 
                 if len(batch) >= batch_size:
                     cur.executemany(INSERT_SQL, batch)
@@ -98,6 +102,7 @@ def load_posts(batch_size=1000):
 
         if batch:
             cur.executemany(INSERT_SQL, batch)
+    print(f"done: {count:,} rows loaded", flush=True)
 
 
 load_posts()
