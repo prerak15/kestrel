@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "sources": {
+    "serverfault": {
+      "url": "https://archive.org/download/stackexchange/serverfault.com.7z",
+      "path": "data/raw/serverfault.com.7z",
+      "sha1": "d9e7c0987f9e11c44d279aa95e1345f8563b1f81"
+    }
+  }
+}

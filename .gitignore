@@ -32,7 +32,7 @@ models/
 # ── Secrets ──
 .env
 .env.*
-
+!.env.example
 # ── Editor / OS ──
 .idea/
 .DS_Store

@@ -1,0 +1,17 @@
+name: kestrel
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.0-pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: prerak
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: kestrel
+    ports:
+      - "5432:5432"
+    volumes:
+      - kestrel_pgdata:/var/lib/postgresql/data
+
+volumes:
+  kestrel_pgdata:
