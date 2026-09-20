@@ -55,20 +55,31 @@ def build_row(elem, table_name):
             "related_post_id": to_int(elem.attrib.get("RelatedPostId")),
             "link_type_id": to_int(elem.attrib.get("LinkTypeId")),
         }
+
+    elif table_name == "posthistory":
+        return {
+            "id": to_int(elem.attrib.get("Id")),
+            "post_history_type_id": to_int(elem.attrib.get("PostHistoryTypeId")),
+            "post_id": to_int(elem.attrib.get("PostId")),
+            "revision_guid": elem.attrib.get("RevisionGUID"),
+            "creation_date": to_datetime(elem.attrib.get("CreationDate")),
+            "user_id": to_int(elem.attrib.get("UserId")),
+            "revision_text": elem.attrib.get("Text"),
+        }
     else:
         raise ValueError(f"unknown table: {table_name}")
 
 
-def load_db(table_name, COLUMNS, xml_path, batch_size=1000):
+def load_db(table_name, columns, xml_path, batch_size=1000):
 
     load_dotenv("deploy/.env")
     password = os.environ.get("POSTGRES_PASSWORD")
     if not password:
         raise SystemExit("POSTGRES_PASSWORD not set - check deploy/.env")
 
-    placeholders = ", ".join(f"%({c})s" for c in COLUMNS)
+    placeholders = ", ".join(f"%({c})s" for c in columns)
 
-    INSERT_SQL = f"INSERT INTO {table_name} ({', '.join(COLUMNS)}) VALUES ({placeholders})"
+    INSERT_SQL = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({placeholders})"
 
     batch = []
 
@@ -101,8 +112,8 @@ def load_db(table_name, COLUMNS, xml_path, batch_size=1000):
     print(f"done: {count:,} rows loaded", flush=True)
 
 
-def load_posts(folder):
-    COLUMNS = [
+def load_details(folder):
+    columns = [
         "id",
         "post_type_id",
         "creation_date",
@@ -122,16 +133,29 @@ def load_posts(folder):
         "favorite_count",
     ]
 
-    load_db("posts", COLUMNS, os.path.join(folder, "Posts.xml"))
+    load_db("posts", columns, os.path.join(folder, "Posts.xml"))
+
+    columns = ["id", "creation_date", "post_id", "related_post_id", "link_type_id"]
+
+    load_db("postlinks", columns, os.path.join(folder, "PostLinks.xml"))
+
+    columns = [
+        "id",
+        "post_history_type_id",
+        "post_id",
+        "revision_guid",
+        "creation_date",
+        "user_id",
+        "revision_text",
+    ]
+
+    load_db("posthistory", columns, os.path.join(folder, "PostHistory.xml"))
 
 
-def load_postlinks(folder):
-    COLUMNS = ["id", "creation_date", "post_id", "related_post_id", "link_type_id"]
+def main():
+    folder = sys.argv[1]
+    load_details(folder)
 
-    load_db("postlinks", COLUMNS, os.path.join(folder, "PostLinks.xml"))
 
-
-folder = sys.argv[1]
-
-load_posts(folder)
-load_postlinks(folder)
+if __name__ == "__main__":
+    main()
