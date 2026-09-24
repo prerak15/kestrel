@@ -2,16 +2,32 @@
   "schema_version": 1,
   "sources": {
     "serverfault": {
+      "type": "archive",
       "url": "https://archive.org/download/stackexchange/serverfault.com.7z",
       "path": "data/raw/serverfault.com.7z",
       "sha1": "d9e7c0987f9e11c44d279aa95e1345f8563b1f81",
       "bytes": 859606467,
+      "dump_version": "2024-04-06",
       "extract_to": "data/raw/serverfault",
       "extracted_files": {
         "Posts.xml": 1211184381,
         "PostLinks.xml": 4198499,
         "PostHistory.xml": 1964774419
       }
+    },
+    "kubernetes-website": {
+      "type": "git",
+      "url": "https://github.com/kubernetes/website.git",
+      "path": "data/repos/kubernetes-website",
+      "commit": "5dd61e17b222c0220281657b843a3e15c86b3cfe",
+      "license": "CC-BY-4.0"
+    },
+    "prometheus-runbooks": {
+      "type": "git",
+      "url": "https://github.com/prometheus-operator/runbooks.git",
+      "path": "data/repos/prometheus-runbooks",
+      "commit": "a685d14cf5128bb30e2bf935c3983decd772d885",
+      "license": "Apache-2.0"
     }
   }
 }

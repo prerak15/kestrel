@@ -56,23 +56,67 @@ def extract(src):
     subprocess.run(["7z", "x", src["path"], f"-o{src['extract_to']}", "-y"], check=True)
 
 
+def git_head(path):
+    result = subprocess.run(
+        ["git", "-C", path, "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def fetch_archive(name, src):
+    if not os.path.exists(src["path"]):
+        print(f"{name}: downloading")
+        download(src["url"], src["path"])
+
+    print(f"{name}: verifying archive")
+    verify(name, src)
+
+    if needs_extract(src):
+        print(f"{name}: extracting")
+        extract(src)
+    else:
+        print(f"{name}: extracted files already present and correct size")
+
+
+def fetch_git(name, src):
+    path = src["path"]
+    if not os.path.exists(path):
+        print(f"{name}: cloning")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        subprocess.run(["git", "clone", src["url"], path], check=True)
+
+    commit = src["commit"]
+    if commit is None:
+        head = git_head(path)
+        print(f'{name}: not pinned yet. Add to the manifest:  "commit": "{head}"')
+        return
+
+    if git_head(path) != commit:
+        print(f"{name}: checking out {commit[:12]}")
+        subprocess.run(["git", "-C", path, "fetch", "--quiet"], check=True)
+        subprocess.run(["git", "-C", path, "checkout", "--quiet", commit], check=True)
+
+    head = git_head(path)
+    if head != commit:
+        raise SystemExit(f"{name}: HEAD is {head}, manifest pins {commit}")
+    print(f"{name}: at pinned commit {commit[:12]}")
+
+
 def main():
     with open(MANIFEST) as f:
         manifest = json.load(f)
 
     for name, src in manifest["sources"].items():
-        if not os.path.exists(src["path"]):
-            print(f"{name}: downloading")
-            download(src["url"], src["path"])
-
-        print(f"{name}: verifying archive")
-        verify(name, src)
-
-        if needs_extract(src):
-            print(f"{name}: extracting")
-            extract(src)
+        kind = src["type"]
+        if kind == "archive":
+            fetch_archive(name, src)
+        elif kind == "git":
+            fetch_git(name, src)
         else:
-            print(f"{name}: extracted files already present and correct size")
+            raise SystemExit(f"{name}: unknown source type {kind!r}")
 
     print("all sources ok")
 
